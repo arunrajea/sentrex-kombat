@@ -1,6 +1,6 @@
 /* =====================================================================
    ROSTER — this is the only file you need to edit to add your friends.
-   7 women and 3 men, each with their own costume.
+   8 women and 4 men, each with their own costume.
 
    For each fighter:
      name    : shown in menus, on the health bar, and spoken by the announcer
@@ -45,7 +45,9 @@ window.ROSTER = [
   // ---- women (continued) and men ----
   { name: 'JENI', title: 'Now You See Her', gender: 'f', costume: 'ninja', shirt: '#1b1b2f', pants: '#1b1b2f', accent: '#ff4081', skin: '#c99672', hair: '#101010', hairStyle: 'ponytail', build: 0.95, speed: 5, power: 2, health: 2, face: { hair: 'parted', lips: 1, clip: 1 }, special: 'teleport' },
   { name: 'ANNSHIA', title: 'Never Where You Look', gender: 'f', costume: 'hoodie', shirt: '#ffb74d', pants: '#37474f', accent: '#7c4dff', skin: '#a8744e', hair: '#1a1310', hairStyle: 'wavy', speed: 4, power: 2, health: 3, face: { hair: 'curly', lips: 1, smile: 'closed', earrings: 'hoop' }, special: 'teleport' },
+  { name: 'KABINA', title: 'Grace Under Pressure', gender: 'f', costume: 'dress', shirt: '#2e7d32', pants: '#1b5e20', accent: '#ffd54f', skin: '#c08a60', hair: '#15110f', hairStyle: 'long', speed: 3, power: 3, health: 3, face: { hair: 'parted', lips: 1, smile: 'teeth', earrings: 'hoop' }, special: 'uppercut' },
   { name: 'CARLOS', title: 'The Immovable', gender: 'm', costume: 'boxer', shirt: '#5d4037', pants: '#c62828', accent: '#fdd835', skin: '#c58c5c', hair: '#1c1410', hairStyle: 'none', build: 1.2, speed: 1, power: 4, health: 5, face: { hair: 'short', beard: 'stubble' }, special: 'quake' },
   { name: 'VIRAJ', title: 'Sharp Dressed', gender: 'm', costume: 'suit', shirt: '#20232a', pants: '#20232a', accent: '#26c6da', skin: '#9a6a48', hair: '#17110d', hairStyle: 'none', speed: 4, power: 3, health: 2, face: { hair: 'quiff', beard: 'short', moustache: 1, glasses: 'thin' }, special: 'uppercut' },
   { name: 'PURAV', title: 'Unstoppable', gender: 'm', costume: 'commando', shirt: '#4b5320', pants: '#6b6b47', accent: '#ff7043', skin: '#8a5a3c', hair: '#17110d', hairStyle: 'none', build: 1.1, speed: 2, power: 4, health: 3, face: { hair: 'messy', beard: 'goatee', moustache: 'thin' }, special: 'dash' },
+  { name: 'KEVIN', title: 'Full Throttle', gender: 'm', costume: 'biker', shirt: '#263238', pants: '#1a1a1a', accent: '#ff5252', skin: '#d0a078', hair: '#2a1a10', hairStyle: 'none', speed: 3, power: 3, health: 3, face: { hair: 'swept', beard: 'stubble', smile: 'closed' }, special: 'fireball' },
 ];

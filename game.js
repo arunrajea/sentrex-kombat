@@ -6,7 +6,7 @@ const W = 960, H = 540, GROUND = 468;
 const cv = document.getElementById('game'), ctx = cv.getContext('2d');
 const ROSTER = window.ROSTER, TITLE = window.GAME_TITLE || 'SENTREX KOMBAT';
 const FONT = 'Impact, "Arial Black", sans-serif';
-const BUILD = 'version 1';   // shown on the title screen so you can tell which copy is loaded
+const BUILD = 'version 2';   // shown on the title screen so you can tell which copy is loaded
 const rand = (a = 1, b) => b === undefined ? Math.random() * a : a + Math.random() * (b - a);
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -1100,7 +1100,7 @@ function updateTitle() {
   }
 }
 function updateSelect() {
-  const S = G.sel, n = ROSTER.length, cols = 5, onl = G.mode === 'online', arc = G.mode === 'arcade', both = [K1, K2];
+  const S = G.sel, n = ROSTER.length, cols = Math.ceil(n / 2), onl = G.mode === 'online', arc = G.mode === 'arcade', both = [K1, K2];
   G.t++;
   if (pressed.Escape) {
     sfx.back();
@@ -1784,7 +1784,8 @@ function bg() {
 function renderTitle() {
   bg();
   text(BUILD, W - 12, 14, 12, '#a99', 'right', null);
-  ROSTER.forEach((d, i) => face(d, 66 + i * 92, 500 + Math.sin(G.t * .05 + i) * 4, 30, i >= ROSTER.length / 2));
+  const gap = (W - 40) / ROSTER.length;
+  ROSTER.forEach((d, i) => face(d, 20 + gap * (i + .5), 500 + Math.sin(G.t * .05 + i) * 4, Math.min(30, gap * .42), i >= ROSTER.length / 2));
   ctx.save(); ctx.translate(W / 2, 120); ctx.rotate(-.04);
   text(TITLE, 4, 5, 108, '#000', 'center', null); text(TITLE, 0, 0, 108, '#ffd23f');
   ctx.restore();
@@ -1851,9 +1852,9 @@ function renderSelect() {
     face(d, W - 36, y, 16, true);
     text(`${p === me ? 'YOU' : 'P' + (p + 1)}   ${d.name}${S.lock[p] ? '  ✓' : ''}`, W - 62, y, 18, S.lock[p] ? '#ffd23f' : PCOL[p], 'right');
   });
-  const cw = 104, x0 = W / 2 - cw * 2.5, y0 = 300;
+  const cols = Math.ceil(ROSTER.length / 2), cw = Math.min(104, Math.floor(900 / cols)), x0 = W / 2 - cw * cols / 2, y0 = 300;
   ROSTER.forEach((d, i) => {
-    const x = x0 + (i % 5) * cw, y = y0 + (i / 5 | 0) * cw;
+    const x = x0 + (i % cols) * cw, y = y0 + (i / cols | 0) * cw;
     ctx.fillStyle = shade(d.shirt, -.5); ctx.fillRect(x + 4, y + 4, cw - 8, cw - 8);
     face(d, x + cw / 2, y + cw / 2 - 6, 36);
     text(d.name, x + cw / 2, y + cw - 14, 14, '#fff');
