@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Sentrex Kombat</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; overscroll-behavior: none;
+               touch-action: none; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body { position: fixed; inset: 0; width: 100%; }
+  canvas, #touch, #touch * { touch-action: none; }
+  #codebox, #codebox * { touch-action: manipulation; }
+  body { display: flex; align-items: center; justify-content: center; height: 100dvh;
+         -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; touch-action: none; }
+  canvas { width: min(100vw, calc(100dvh * 16 / 9)); height: auto; aspect-ratio: 16 / 9; display: block; background: #111; }
+
+  /* ---------- touch controls (phones and tablets) ---------- */
+  #touch { position: fixed; inset: 0; pointer-events: none; --b: clamp(46px, 17vh, 78px); font-family: Impact, "Arial Black", sans-serif; }
+  #touch[hidden] { display: none; }
+  #touch > * { pointer-events: auto; touch-action: none; }
+  #pad { position: absolute; left: max(14px, env(safe-area-inset-left)); bottom: max(12px, env(safe-area-inset-bottom));
+         width: clamp(110px, 40vh, 180px); aspect-ratio: 1; border-radius: 50%;
+         background: rgba(255,255,255,.10); border: 2px solid rgba(255,255,255,.35); }
+  #pad::before { content: '▲'; position: absolute; top: 4%; left: 0; right: 0; text-align: center; color: rgba(255,255,255,.4); font-size: 14px; }
+  #pad::after { content: '▼'; position: absolute; bottom: 4%; left: 0; right: 0; text-align: center; color: rgba(255,255,255,.4); font-size: 14px; }
+  #stick { position: absolute; left: 30%; top: 30%; width: 40%; height: 40%; border-radius: 50%;
+           background: rgba(255,255,255,.45); border: 2px solid rgba(0,0,0,.5); box-sizing: border-box; pointer-events: none; }
+  #btns { position: absolute; right: max(14px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom));
+          display: grid; grid-template-columns: repeat(2, var(--b)); gap: calc(var(--b) * .14); }
+  #touch button { border: 2px solid rgba(0,0,0,.6); border-radius: 50%; color: #fff; font: inherit; padding: 0; margin: 0;
+                  text-shadow: 0 1px 2px #000; opacity: .72; line-height: 1; }
+  #btns button { width: var(--b); height: var(--b); font-size: calc(var(--b) * .34); }
+  #btns button small { display: block; font-size: calc(var(--b) * .2); opacity: .85; margin-top: 2px; }
+  #touch button.on { opacity: 1; transform: scale(.9); filter: brightness(1.4); }
+  .lp { background: #1e88e5; } .rp { background: #f9a825; } .lk { background: #43a047; } .rk { background: #e53935; }
+  #btns .sp { position: absolute; right: calc(100% + var(--b) * .18); bottom: calc(var(--b) * .55);
+              width: calc(var(--b) * .9); height: calc(var(--b) * .9); background: #8e24aa; }
+  #menu, #fs { position: absolute; top: max(6px, env(safe-area-inset-top)); width: 38px; height: 38px; font-size: 18px;
+               background: rgba(40,40,40,.8); border-radius: 10px !important; }
+  #menu { left: max(6px, env(safe-area-inset-left)); } #fs { right: max(6px, env(safe-area-inset-right)); }
+
+  /* microphone button for voice chat (shown while online) */
+  #mic { position: fixed; top: max(6px, env(safe-area-inset-top)); right: calc(max(6px, env(safe-area-inset-right)) + 46px);
+         width: 38px; height: 38px; font-size: 18px; padding: 0; border-radius: 10px; border: 2px solid rgba(0,0,0,.6);
+         background: rgba(40,40,40,.8); opacity: .8; touch-action: none; filter: grayscale(1); }
+  #mic[hidden] { display: none; }
+  #mic.on { background: #2e7d32; opacity: 1; filter: none; box-shadow: 0 0 0 3px #c6ff00; }
+
+  /* room-code box for phones */
+  #codebox { position: fixed; left: 50%; top: 34%; transform: translate(-50%, -50%); display: flex; gap: 10px; touch-action: auto; }
+  #codebox[hidden] { display: none; }
+  #codebox input { width: 7.5em; font: 34px Impact, "Arial Black", sans-serif; letter-spacing: .3em; text-align: center; text-transform: uppercase;
+                   padding: 8px 4px; border-radius: 10px; border: 3px solid #ffd23f; background: #1a0a2e; color: #fff; -webkit-user-select: text; user-select: text; }
+  #codebox button { font: 26px Impact, "Arial Black", sans-serif; padding: 0 22px; border-radius: 10px; border: 0; background: #ffd23f; color: #111; }
+
+  #rotate { display: none; position: fixed; inset: 0; background: #1a0a2e; color: #ffd23f; align-items: center; justify-content: center;
+            text-align: center; font: 28px Impact, "Arial Black", sans-serif; padding: 30px; z-index: 5; }
+  @media (orientation: portrait) and (pointer: coarse) { #rotate { display: flex; } }
+</style>
+</head>
+<body>
+<canvas id="game" width="960" height="540"></canvas>
+
+<div id="touch" hidden>
+  <div id="pad"><div id="stick"></div></div>
+  <div id="btns">
+    <button class="sp" data-k="KeyH">SP</button>
+    <button class="lp" data-k="KeyF">LP<small>L punch</small></button>
+    <button class="rp" data-k="KeyG">RP<small>R punch</small></button>
+    <button class="lk" data-k="KeyV">LK<small>L kick</small></button>
+    <button class="rk" data-k="KeyB">RK<small>R kick</small></button>
+  </div>
+  <button id="menu" data-k="Escape" aria-label="Pause or back">☰</button>
+  <button id="fs" aria-label="Full screen">⛶</button>
+</div>
+
+<button id="mic" hidden aria-label="Microphone on or off">🎤</button>
+
+<form id="codebox" hidden>
+  <input id="code" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="CODE" aria-label="Room code">
+  <button type="submit">JOIN</button>
+</form>
+
+<div id="rotate">Turn your phone sideways to play ↻</div>
+
+<script>
+  // Load the game files with a fresh address every visit, so phones and browsers
+  // never keep showing an old saved copy after the game is updated.
+  (function () {
+    var stamp = Date.now();
+    function load(src, then) {
+      var s = document.createElement('script');
+      s.src = src + '?v=' + stamp; s.onload = then; document.body.appendChild(s);
+    }
+    load('roster.js', function () { load('game.js'); });
+  })();
+</script>
+</body>
+</html>
